@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>TidyWin32</PackageId>
+    <Title>TidyWin32</Title>
+    <Version>1.0.0</Version>
+    <Authors>李东明</Authors>
+    <LangVersion>latest</LangVersion>
+    <Platforms>AnyCPU;x64</Platforms>
+    <BaseOutputPath>$([System.IO.Path]::GetTempPath())Temp\$(MSBuildProjectName)\$(Configuration)\$(Platform)\bin\</BaseOutputPath>
+    <IntermediateOutputPath>$([System.IO.Path]::GetTempPath())Temp\$(MSBuildProjectName)\$(Configuration)\$(Platform)\obj\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="8.0.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DotNet_Core\TidyHPC\TidyHPC.csproj" />
+  </ItemGroup>
+</Project>
