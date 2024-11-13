@@ -91,7 +91,7 @@ public partial class Win32
             return hWnd;
         }
 
-        public WindowInterface[] GetChildren()
+        public WindowInterface[] GetAllChildren()
         {
             List<WindowInterface> children = new();
             EnumChildWindows(hWnd, (hWnd, lParam) =>
@@ -100,6 +100,21 @@ public partial class Win32
                 return true;
             }, IntPtr.Zero);
             return [.. children];
+        }
+
+        public WindowInterface[] GetChildren()
+        {
+            List<WindowInterface> children = [];
+            IntPtr childHandle = Win32.GetWindow(hWnd, GW_CHILD);  // 获取父窗口的第一个子窗口
+
+            // 遍历所有子窗口
+            while (childHandle != IntPtr.Zero)
+            {
+                children.Add(childHandle); // 添加当前子窗口
+                childHandle = Win32.GetWindow(childHandle, GW_HWNDNEXT); // 获取下一个兄弟窗口
+            }
+
+            return children.ToArray();
         }
 
         public bool Enable
