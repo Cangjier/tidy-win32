@@ -19,6 +19,11 @@ public partial class Win32
     [DllImport("gdi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     public static extern bool DeleteObject(IntPtr hObject);
 
+    [DllImport("gdi32.dll")]
+    public static extern bool BitBlt(IntPtr hdcDest, int xDest, int yDest, int width, int height,
+                                      IntPtr hdcSrc, int xSrc, int ySrc, int rop);
+
+
     public static uint RGB(byte r, byte g, byte b)
     {
         return (uint)((r << 16) | (g << 8) | b);

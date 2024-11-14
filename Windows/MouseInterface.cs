@@ -20,18 +20,16 @@ public partial class Win32
 
         public static void MoveTo(int x, int y)
         {
-            POINT currentPos;
-            GetCursorPos(out currentPos);
-
-            int deltaX = x - currentPos.X;
-            int deltaY = y - currentPos.Y;
-
+            int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+            int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+            x = x * 65535 / screenWidth;
+            y = y * 65535 / screenHeight;
             INPUT mouseInput = new INPUT();
             mouseInput.type = INPUT_MOUSE;
-            mouseInput.U.mi.dx = deltaX;
-            mouseInput.U.mi.dy = deltaY;
+            mouseInput.U.mi.dx = x;
+            mouseInput.U.mi.dy = y;
             mouseInput.U.mi.mouseData = 0;
-            mouseInput.U.mi.dwFlags = MOUSEEVENTF_MOVE;
+            mouseInput.U.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
             mouseInput.U.mi.time = 0;
             mouseInput.U.mi.dwExtraInfo = IntPtr.Zero;
 

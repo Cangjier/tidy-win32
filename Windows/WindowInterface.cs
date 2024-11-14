@@ -532,22 +532,71 @@ public partial class Win32
 #pragma warning disable CA1416 // 验证平台兼容性
         public Bitmap Capture()
         {
-            // 判断是Windows系统
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            RECT clientRect;
+            GetClientRect(hWnd, out clientRect);
+            Point topLeft = new Point(clientRect.Left, clientRect.Top);
+            Point bottomRight = new Point(clientRect.Right, clientRect.Bottom);
+
+            // 转换客户区坐标为屏幕坐标
+            ClientToScreen(hWnd, ref topLeft);
+            ClientToScreen(hWnd, ref bottomRight);
+
+            // 创建客户区的矩形区域
+            Rectangle rect = new Rectangle(topLeft.X, topLeft.Y, bottomRight.X - topLeft.X, bottomRight.Y - topLeft.Y);
+
+            // 考虑DPI缩放
+            using (Graphics gfx = Graphics.FromHwnd(hWnd))
             {
-                Rectangle rect;
-                GetWindowRect(hWnd, out rect);
-                Bitmap bmp = new(rect.Width, rect.Height);
-                using Graphics gfxBmp = Graphics.FromImage(bmp);
-                IntPtr hdcBitmap = gfxBmp.GetHdc();
-                PrintWindow(hWnd, hdcBitmap, 0);
-                gfxBmp.ReleaseHdc(hdcBitmap);
-                return bmp;
+                float dpiX = gfx.DpiX / 96.0f;
+                float dpiY = gfx.DpiY / 96.0f;
+                rect.Width = (int)(rect.Width * dpiX);
+                rect.Height = (int)(rect.Height * dpiY);
             }
-            else
+
+            Bitmap bmp = new Bitmap(rect.Width, rect.Height);
+            using Graphics gfxBmp = Graphics.FromImage(bmp);
+            IntPtr hdcBitmap = gfxBmp.GetHdc();
+
+            bool success = PrintWindow(hWnd, hdcBitmap, 0);
+            gfxBmp.ReleaseHdc(hdcBitmap);
+
+            if (!success)
             {
-                throw new PlatformNotSupportedException();
+                throw new InvalidOperationException("PrintWindow failed.");
             }
+
+            return bmp;
+        }
+
+        public void SetForeground()
+        {
+            SetForegroundWindow(hWnd);
+        }
+
+        public Bitmap CaptureForeground()
+        {
+            // 将窗口置于最前面
+            SetForegroundWindow(hWnd);
+
+            // 计算区域在屏幕上的绝对坐标
+            var location = Location;
+            var size = Size;
+            int width = size.Width;
+            int height = size.Height;
+            int x = location.X;
+            int y = location.Y;
+
+            // 打印调试信息
+            Console.WriteLine($"Capture area: X={x}, Y={y}, Width={width}, Height={height}");
+
+            // 创建一个目标位图
+            Bitmap bmp = new Bitmap(width, height);
+            using (Graphics gfxBmp = Graphics.FromImage(bmp))
+            {
+                gfxBmp.CopyFromScreen(new System.Drawing.Point(x, y), new System.Drawing.Point(0,0), new System.Drawing.Size(width, height));
+            }
+
+            return bmp;
         }
 #pragma warning restore CA1416 // 验证平台兼容性
         public void InitializeInfomation()
