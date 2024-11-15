@@ -190,6 +190,12 @@ public partial class Win32
     [DllImport("user32.dll")]
     public static extern IntPtr GetWindowDC(IntPtr hWnd);
 
+    [DllImport("user32.dll")]
+    public static extern IntPtr SetFocus(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern bool IsWindowVisible(IntPtr hWnd);
+
     // 定义截屏的拷贝方式
     public const int SRCCOPY = 0x00CC0020;
 }

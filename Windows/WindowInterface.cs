@@ -127,6 +127,16 @@ public partial class Win32
             }
         }
 
+        public bool Visible
+        {
+            get
+            {
+                bool result = IsWindowVisible(hWnd);
+                Target.Set(nameof(Visible), result);
+                return result;
+            }
+        }
+
         public bool IsUserWindow()
         {
             // 检查句柄是否为一个窗口  
@@ -162,6 +172,11 @@ public partial class Win32
         {
             const int SW_MINIMIZE = 6;
             ShowWindow(hWnd, SW_MINIMIZE);
+        }
+
+        public void Focus()
+        {
+            SetFocus(hWnd);
         }
 
         public string Text
@@ -610,6 +625,7 @@ public partial class Win32
                 _ = Size;
                 _ = Location;
                 _ = ClientRect;
+                _ = Visible;
                 ComboBoxInterface comboBox = Target;
                 if (comboBox.GetCount() != 0)
                 {

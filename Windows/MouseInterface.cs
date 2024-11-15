@@ -59,6 +59,15 @@ public partial class Win32
             SendInput(2, inputs, INPUT.Size);
         }
 
+        public static void Click2()
+        {
+            // 鼠标左键按下
+            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+
+            // 鼠标左键弹起
+            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+        }
+
         public static void RightClick()
         {
             INPUT[] inputs = new INPUT[2];
