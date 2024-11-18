@@ -7,7 +7,7 @@ public partial class Win32
     public struct INPUT
     {
         public uint type;
-        public InputUnion U;
+        public InputUnion u;
         public static int Size => Marshal.SizeOf(typeof(INPUT));
     }
 }

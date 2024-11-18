@@ -377,7 +377,7 @@ public partial class Win32
             var inputMouseDown = new INPUT
             {
                 type = INPUT_MOUSE,
-                U = new InputUnion
+                u = new InputUnion
                 {
                     mi = new MOUSEINPUT
                     {
@@ -394,7 +394,7 @@ public partial class Win32
             var inputMouseUp = new INPUT
             {
                 type = INPUT_MOUSE,
-                U = new InputUnion
+                u = new InputUnion
                 {
                     mi = new MOUSEINPUT
                     {
@@ -417,7 +417,7 @@ public partial class Win32
             var inputMouseDown = new INPUT
             {
                 type = INPUT_MOUSE,
-                U = new InputUnion
+                u = new InputUnion
                 {
                     mi = new MOUSEINPUT
                     {
@@ -434,7 +434,7 @@ public partial class Win32
             var inputMouseUp = new INPUT
             {
                 type = INPUT_MOUSE,
-                U = new InputUnion
+                u = new InputUnion
                 {
                     mi = new MOUSEINPUT
                     {
@@ -460,7 +460,7 @@ public partial class Win32
                 var input = new INPUT
                 {
                     type = INPUT_KEYBOARD,
-                    U = new InputUnion
+                    u = new InputUnion
                     {
                         ki = new KEYBDINPUT
                         {
@@ -496,7 +496,7 @@ public partial class Win32
                 inputs[i * 2] = new INPUT
                 {
                     type = INPUT_KEYBOARD,
-                    U = new InputUnion
+                    u = new InputUnion
                     {
                         ki = new KEYBDINPUT
                         {
@@ -512,7 +512,7 @@ public partial class Win32
                 inputs[i * 2 + 1] = new INPUT
                 {
                     type = INPUT_KEYBOARD,
-                    U = new InputUnion
+                    u = new InputUnion
                     {
                         ki = new KEYBDINPUT
                         {

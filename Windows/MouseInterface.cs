@@ -8,12 +8,12 @@ public partial class Win32
         {
             INPUT mouseInput = new INPUT();
             mouseInput.type = INPUT_MOUSE;
-            mouseInput.U.mi.dx = deltaX;
-            mouseInput.U.mi.dy = deltaY;
-            mouseInput.U.mi.mouseData = 0;
-            mouseInput.U.mi.dwFlags = MOUSEEVENTF_MOVE;
-            mouseInput.U.mi.time = 0;
-            mouseInput.U.mi.dwExtraInfo = IntPtr.Zero;
+            mouseInput.u.mi.dx = deltaX;
+            mouseInput.u.mi.dy = deltaY;
+            mouseInput.u.mi.mouseData = 0;
+            mouseInput.u.mi.dwFlags = MOUSEEVENTF_MOVE;
+            mouseInput.u.mi.time = 0;
+            mouseInput.u.mi.dwExtraInfo = IntPtr.Zero;
 
             SendInput(1, [mouseInput], INPUT.Size);
         }
@@ -26,12 +26,12 @@ public partial class Win32
             y = y * 65535 / screenHeight;
             INPUT mouseInput = new INPUT();
             mouseInput.type = INPUT_MOUSE;
-            mouseInput.U.mi.dx = x;
-            mouseInput.U.mi.dy = y;
-            mouseInput.U.mi.mouseData = 0;
-            mouseInput.U.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
-            mouseInput.U.mi.time = 0;
-            mouseInput.U.mi.dwExtraInfo = IntPtr.Zero;
+            mouseInput.u.mi.dx = x;
+            mouseInput.u.mi.dy = y;
+            mouseInput.u.mi.mouseData = 0;
+            mouseInput.u.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+            mouseInput.u.mi.time = 0;
+            mouseInput.u.mi.dwExtraInfo = IntPtr.Zero;
 
             SendInput(1, [mouseInput], INPUT.Size);
         }
@@ -41,20 +41,20 @@ public partial class Win32
             INPUT[] inputs = new INPUT[2];
 
             inputs[0].type = INPUT_MOUSE;
-            inputs[0].U.mi.dx = 0;
-            inputs[0].U.mi.dy = 0;
-            inputs[0].U.mi.mouseData = 0;
-            inputs[0].U.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-            inputs[0].U.mi.time = 0;
-            inputs[0].U.mi.dwExtraInfo = IntPtr.Zero;
+            inputs[0].u.mi.dx = 0;
+            inputs[0].u.mi.dy = 0;
+            inputs[0].u.mi.mouseData = 0;
+            inputs[0].u.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+            inputs[0].u.mi.time = 0;
+            inputs[0].u.mi.dwExtraInfo = IntPtr.Zero;
 
             inputs[1].type = INPUT_MOUSE;
-            inputs[1].U.mi.dx = 0;
-            inputs[1].U.mi.dy = 0;
-            inputs[1].U.mi.mouseData = 0;
-            inputs[1].U.mi.dwFlags = MOUSEEVENTF_LEFTUP;
-            inputs[1].U.mi.time = 0;
-            inputs[1].U.mi.dwExtraInfo = IntPtr.Zero;
+            inputs[1].u.mi.dx = 0;
+            inputs[1].u.mi.dy = 0;
+            inputs[1].u.mi.mouseData = 0;
+            inputs[1].u.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+            inputs[1].u.mi.time = 0;
+            inputs[1].u.mi.dwExtraInfo = IntPtr.Zero;
 
             SendInput(2, inputs, INPUT.Size);
         }
@@ -73,20 +73,20 @@ public partial class Win32
             INPUT[] inputs = new INPUT[2];
 
             inputs[0].type = INPUT_MOUSE;
-            inputs[0].U.mi.dx = 0;
-            inputs[0].U.mi.dy = 0;
-            inputs[0].U.mi.mouseData = 0;
-            inputs[0].U.mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
-            inputs[0].U.mi.time = 0;
-            inputs[0].U.mi.dwExtraInfo = IntPtr.Zero;
+            inputs[0].u.mi.dx = 0;
+            inputs[0].u.mi.dy = 0;
+            inputs[0].u.mi.mouseData = 0;
+            inputs[0].u.mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
+            inputs[0].u.mi.time = 0;
+            inputs[0].u.mi.dwExtraInfo = IntPtr.Zero;
 
             inputs[1].type = INPUT_MOUSE;
-            inputs[1].U.mi.dx = 0;
-            inputs[1].U.mi.dy = 0;
-            inputs[1].U.mi.mouseData = 0;
-            inputs[1].U.mi.dwFlags = MOUSEEVENTF_RIGHTUP;
-            inputs[1].U.mi.time = 0;
-            inputs[1].U.mi.dwExtraInfo = IntPtr.Zero;
+            inputs[1].u.mi.dx = 0;
+            inputs[1].u.mi.dy = 0;
+            inputs[1].u.mi.mouseData = 0;
+            inputs[1].u.mi.dwFlags = MOUSEEVENTF_RIGHTUP;
+            inputs[1].u.mi.time = 0;
+            inputs[1].u.mi.dwExtraInfo = IntPtr.Zero;
 
             SendInput(2, inputs, INPUT.Size);
         }
