@@ -73,10 +73,90 @@ public partial class Win32
         public void FullNodes()
         {
             _ = Text;
+            _ = Rectangle;
+            InitializeNodeInfomation();
             foreach (var node in Nodes)
             {
                 node.FullNodes();
             }
+        }
+
+        public RECT Rectangle
+        {
+            get
+            {
+                // 获取树节点的矩形信息
+                RECT rect = new RECT();
+
+                // 将 wParam 设置为 TRUE（非零）以包含树节点的图标和标签区域
+                IntPtr wParam = new IntPtr(1);
+
+                // 发送消息获取节点的矩形
+                IntPtr result = SendMessage(hWnd, TVM_GETITEMRECT, wParam, ref rect);
+
+                // 返回矩形
+                return rect;
+            }
+        }
+
+        public bool Selected
+        {
+            get
+            {
+                TVITEM item = new TVITEM
+                {
+                    mask = TVIF_STATE,        // 请求状态信息
+                    hItem = hWnd,   // 节点句柄
+                    stateMask = TVIS_SELECTED // 检查选中状态
+                };
+
+                // 发送 TVM_GETITEM 消息
+                IntPtr result = SendMessage(TreeViewHWnd, TVM_GETITEM, IntPtr.Zero, ref item);
+
+                // 检查返回结果和选中状态
+                var selected = result != IntPtr.Zero && (item.state & TVIS_SELECTED) != 0;
+                Target.Set("Selected", selected);
+                return selected;
+            }
+
+            set
+            {
+                // 设置节点选中状态
+                TVITEM item = new TVITEM
+                {
+                    mask = TVIF_STATE,        // 请求状态信息
+                    hItem = hWnd,   // 节点句柄
+                    stateMask = TVIS_SELECTED, // 设置选中状态
+                    state = (uint)(value ? TVIS_SELECTED : 0) // 设置选中状态
+                };
+
+                // 发送 TVM_SETITEM 消息
+                IntPtr result = SendMessage(TreeViewHWnd, TVM_SETITEM, IntPtr.Zero, ref item);
+            }
+        }
+
+        public void InitializeNodeInfomation()
+        {
+            TVITEM item = new TVITEM
+            {
+                mask = TVIF_STATE,        // 请求状态信息
+                hItem = hWnd,   // 节点句柄
+                stateMask = TVIS_SELECTED // 检查选中状态
+            };
+
+            // 发送 TVM_GETITEM 消息
+            IntPtr result = SendMessage(TreeViewHWnd, TVM_GETITEM, IntPtr.Zero, ref item);
+            Target.Set("mask", item.mask);
+            Target.Set("state", item.state);
+            Target.Set("stateMask", item.stateMask);
+            Target.Set("hItem", item.hItem);
+            Target.Set("pszText", item.pszText);
+            Target.Set("cchTextMax", item.cchTextMax);
+            Target.Set("iImage", item.iImage);
+            Target.Set("iSelectedImage", item.iSelectedImage);
+            Target.Set("cChildren", item.cChildren);
+            Target.Set("lParam", item.lParam);
+
         }
     }
 

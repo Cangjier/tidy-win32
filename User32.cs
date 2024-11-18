@@ -196,6 +196,12 @@ public partial class Win32
     [DllImport("user32.dll")]
     public static extern bool IsWindowVisible(IntPtr hWnd);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, ref RECT lParam);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, ref TVITEM lParam);
+
     // 定义截屏的拷贝方式
     public const int SRCCOPY = 0x00CC0020;
 }
