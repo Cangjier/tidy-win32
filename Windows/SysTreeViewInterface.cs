@@ -1,5 +1,7 @@
-﻿using System.Text;
+﻿using System.Runtime.InteropServices;
+using System.Text;
 using TidyHPC.LiteJson;
+using static TidyWin32.Win32;
 
 namespace TidyWin32;
 public partial class Win32
@@ -85,79 +87,92 @@ public partial class Win32
         {
             get
             {
-                // 获取树节点的矩形信息
-                RECT rect = new RECT();
-
-                // 将 wParam 设置为 TRUE（非零）以包含树节点的图标和标签区域
-                IntPtr wParam = new IntPtr(1);
-
-                // 发送消息获取节点的矩形
-                IntPtr result = SendMessage(hWnd, TVM_GETITEMRECT, wParam, ref rect);
-
-                // 返回矩形
-                return rect;
-            }
-        }
-
-        public bool Selected
-        {
-            get
-            {
-                TVITEM item = new TVITEM
+                using RemoteVirtual remote = new(TreeViewHWnd);
+                //var tvitem = remote.VirtualAllocEx<TVITEM>(new TVITEM()
+                //{
+                //    hItem = hWnd,
+                //    mask = TVIF_HANDLE
+                //});
+                //SendMessage(TreeViewHWnd, TVM_GETITEM, 0, tvitem);
+                var rect = remote.VirtualAllocEx<RECT>(new RECT()
                 {
-                    mask = TVIF_STATE,        // 请求状态信息
-                    hItem = hWnd,   // 节点句柄
-                    stateMask = TVIS_SELECTED // 检查选中状态
-                };
-
-                // 发送 TVM_GETITEM 消息
-                IntPtr result = SendMessage(TreeViewHWnd, TVM_GETITEM, IntPtr.Zero, ref item);
-
-                // 检查返回结果和选中状态
-                var selected = result != IntPtr.Zero && (item.state & TVIS_SELECTED) != 0;
-                Target.Set("Selected", selected);
-                return selected;
-            }
-
-            set
-            {
-                // 设置节点选中状态
-                TVITEM item = new TVITEM
-                {
-                    mask = TVIF_STATE,        // 请求状态信息
-                    hItem = hWnd,   // 节点句柄
-                    stateMask = TVIS_SELECTED, // 设置选中状态
-                    state = (uint)(value ? TVIS_SELECTED : 0) // 设置选中状态
-                };
-
-                // 发送 TVM_SETITEM 消息
-                IntPtr result = SendMessage(TreeViewHWnd, TVM_SETITEM, IntPtr.Zero, ref item);
+                    left = (int)hWnd
+                });
+                SendMessage(TreeViewHWnd, TVM_GETITEMRECT, 1, rect);
+                var result = remote.Read<RECT>(rect);
+                var reactangle = Target.GetOrCreateObject("Rectangle");
+                reactangle.Set("Left", result.Left);
+                reactangle.Set("X", result.Left);
+                reactangle.Set("Top", result.Top);
+                reactangle.Set("Y", result.Top);
+                reactangle.Set("Right", result.Right);
+                reactangle.Set("Bottom", result.Bottom);
+                reactangle.Set("Width", result.Width);
+                reactangle.Set("Height", result.Height);
+                return result;
             }
         }
 
         public void InitializeNodeInfomation()
         {
+            const int bufferSize = 256;
+
+            // 在目标进程中分配缓冲区
+            var threadId = GetWindowThreadProcessId(TreeViewHWnd,out uint lpdwProcessId);
+            IntPtr processHandle = OpenProcess(ProcessAccessFlags.All, false, lpdwProcessId);
+            IntPtr remoteBuffer = VirtualAllocEx(processHandle, IntPtr.Zero, bufferSize * sizeof(char),AllocationType.Commit, MemoryProtection.ReadWrite);
+
+            // 创建并初始化 TVITEM 结构
             TVITEM item = new TVITEM
             {
-                mask = TVIF_STATE,        // 请求状态信息
-                hItem = hWnd,   // 节点句柄
-                stateMask = TVIS_SELECTED // 检查选中状态
+                mask = TVIF_TEXT | TVIF_STATE | TVIF_IMAGE | TVIF_PARAM,
+                hItem = hWnd,
+                stateMask = TVIS_SELECTED,
+                pszText = remoteBuffer,
+                cchTextMax = bufferSize
             };
 
-            // 发送 TVM_GETITEM 消息
-            IntPtr result = SendMessage(TreeViewHWnd, TVM_GETITEM, IntPtr.Zero, ref item);
-            Target.Set("mask", item.mask);
-            Target.Set("state", item.state);
-            Target.Set("stateMask", item.stateMask);
-            Target.Set("hItem", item.hItem);
-            Target.Set("pszText", item.pszText);
-            Target.Set("cchTextMax", item.cchTextMax);
-            Target.Set("iImage", item.iImage);
-            Target.Set("iSelectedImage", item.iSelectedImage);
-            Target.Set("cChildren", item.cChildren);
-            Target.Set("lParam", item.lParam);
+            // 在目标进程中分配 TVITEM 结构
+            IntPtr remoteItem = VirtualAllocEx(processHandle, IntPtr.Zero, (uint)Marshal.SizeOf<TVITEM>(),AllocationType.Commit, MemoryProtection.ReadWrite);
 
+            try
+            {
+                // 将 TVITEM 写入目标进程
+                var success = WriteProcessMemory(processHandle, remoteItem, ref item, (uint)Marshal.SizeOf<TVITEM>(), out _);
+
+                SendMessage(TreeViewHWnd, TVM_GETITEM, IntPtr.Zero, remoteItem);
+
+                // 从目标进程读取 TVITEM 和 pszText
+                TVITEM retrievedItem = new TVITEM();
+                ReadProcessMemory(processHandle, remoteItem, ref retrievedItem, (uint)Marshal.SizeOf<TVITEM>(), out _);
+
+                byte[] textBuffer = new byte[bufferSize * sizeof(char)]; 
+                ReadProcessMemory(processHandle, remoteBuffer, textBuffer, (uint)textBuffer.Length, out _);
+                string nodeText = Encoding.Unicode.GetString(textBuffer).TrimEnd('\0');
+
+                // 保存信息到 JSON
+                Target.Set("mask", retrievedItem.mask);
+                Target.Set("state", retrievedItem.state);
+                Target.Set("stateMask", retrievedItem.stateMask);
+                Target.Set("hItem", retrievedItem.hItem);
+                Target.Set("pszText", nodeText);
+                Target.Set("cchTextMax", retrievedItem.cchTextMax);
+                Target.Set("iImage", retrievedItem.iImage);
+                Target.Set("iSelectedImage", retrievedItem.iSelectedImage);
+                Target.Set("cChildren", retrievedItem.cChildren);
+                Target.Set("lParam", retrievedItem.lParam);
+            }
+            finally
+            {
+                // 释放分配的远程内存
+                VirtualFreeEx(processHandle, remoteBuffer, 0, FreeType.Release);
+                VirtualFreeEx(processHandle, remoteItem, 0, FreeType.Release);
+
+                // 关闭进程句柄
+                CloseHandle(processHandle);
+            }
         }
+
     }
 
     public class SysTreeViewInterface(Json target) : WindowInterface(target)

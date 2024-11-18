@@ -202,6 +202,9 @@ public partial class Win32
     [DllImport("user32.dll", SetLastError = true)]
     public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, ref TVITEM lParam);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
     // 定义截屏的拷贝方式
     public const int SRCCOPY = 0x00CC0020;
 }

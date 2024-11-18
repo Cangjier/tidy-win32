@@ -78,6 +78,7 @@ public partial class Win32
     public const int TVIF_IMAGE = 0x0002;
     public const int TVIF_PARAM = 0x0004;
     public const int TVIF_STATE = 0x0008;
+    public const int TVIF_HANDLE = 0x0010;
 
     public const int TVIS_SELECTED = 0x0002;
     public const int TVIS_EXPANDED = 0x0020;
