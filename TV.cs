@@ -1,6 +1,5 @@
 ﻿namespace TidyWin32;
 
-
 public partial class Win32
 {
     public const int TV_FIRST = 0x1100;

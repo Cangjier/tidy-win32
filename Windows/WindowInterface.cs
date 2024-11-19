@@ -634,12 +634,17 @@ public partial class Win32
                     _ = comboBox.SelectedText;
                     _ = comboBox.Items;
                 }
-                if(ClassName== "SysTreeView32")
+                if(ClassName == "SysTreeView32")
                 {
                     SysTreeViewInterface treeView = Target;
                     treeView.FullNodes();
                     _ = treeView.Text;
                     _ = treeView.Count;
+                }
+                if(ClassName == "SysTabControl32")
+                {
+                    TabControlInterface tabControlInterface = Target;
+                    tabControlInterface.InitializeTabControlInfomation();
                 }
             }
         }

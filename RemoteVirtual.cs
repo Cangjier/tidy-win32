@@ -51,13 +51,54 @@ public class RemoteVirtual : IDisposable
         return result;
     }
 
-    public T Read<T>(IntPtr hWnd) where T : struct
+    public IntPtr VirtualAllocString(string value,int maxSize)
+    {
+        var size = (uint)maxSize;
+        var result = Win32.VirtualAllocEx(ProcessHandle, IntPtr.Zero, size, AllocationType.Commit, MemoryProtection.ReadWrite);
+        if (result == IntPtr.Zero)
+            throw new InvalidOperationException("VirtualAllocEx failed.");
+
+        var buffer = Marshal.StringToHGlobalAnsi(value);
+        try
+        {
+            if (!Win32.WriteProcessMemory(ProcessHandle, result, buffer, size, out _))
+                throw new InvalidOperationException("WriteProcessMemory failed.");
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(buffer);
+        }
+
+        lock (VirtualAllocDisposables)
+        {
+            VirtualAllocDisposables.Add(result);
+        }
+
+        return result;
+    }
+
+    public string? ReadString(IntPtr address)
+    {
+        var buffer = Marshal.AllocHGlobal(256);
+        try
+        {
+            if (!Win32.ReadProcessMemory(ProcessHandle, address, buffer, 256, out _))
+                throw new InvalidOperationException("ReadProcessMemory failed.");
+            return Marshal.PtrToStringAnsi(buffer);
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(buffer);
+        }
+    }
+
+    public T Read<T>(IntPtr address) where T : struct
     {
         var size = (uint)Marshal.SizeOf<T>();
         var buffer = Marshal.AllocHGlobal((int)size);
         try
         {
-            if (!Win32.ReadProcessMemory(ProcessHandle, hWnd, buffer, size, out _))
+            if (!Win32.ReadProcessMemory(ProcessHandle, address, buffer, size, out _))
                 throw new InvalidOperationException("ReadProcessMemory failed.");
             return Marshal.PtrToStructure<T>(buffer);
         }

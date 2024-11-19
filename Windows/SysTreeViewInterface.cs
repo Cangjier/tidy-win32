@@ -1,7 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 using TidyHPC.LiteJson;
-using static TidyWin32.Win32;
 
 namespace TidyWin32;
 public partial class Win32

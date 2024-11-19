@@ -39,5 +39,9 @@ public partial class Win32
         public int Width => right - left;
 
         public int Height => bottom - top;
+
+        public int X => left;
+
+        public int Y => top;
     }
 }
