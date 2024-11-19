@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using TidyHPC.LiteJson;
+﻿using TidyHPC.LiteJson;
 
 namespace TidyWin32;
 public partial class Win32
